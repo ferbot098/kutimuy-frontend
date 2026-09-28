@@ -1,0 +1,192 @@
+.layout {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Barra superior */
+.barra-superior {
+  height: 70px;
+  background-color: #ffffff;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 30px;
+
+  border-bottom: 1px solid #ddd;
+
+  gap: 40px;
+}
+
+/* Logo */
+.marca {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 120px;
+}
+
+.marca strong {
+  font-size: 22px;
+}
+
+.marca span {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Menú */
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex: 1;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #444;
+
+  padding: 10px 15px;
+
+  border-radius: 6px;
+
+  transition: 0.2s;
+}
+
+.menu a:hover {
+  background-color: #f0f0f0;
+}
+
+.menu a.activo {
+  background-color: #e8e8e8;
+  color: #000;
+  font-weight: 600;
+}
+
+/* Menú desplegable "Más" */
+.menu-desplegable {
+  position: relative;
+}
+
+.boton-mas {
+  border: none;
+  background: none;
+
+  cursor: pointer;
+  color: #444;
+
+  padding: 10px 15px;
+
+  border-radius: 6px;
+
+  font-family: inherit;
+  font-size: 15px;
+
+  transition: 0.2s;
+}
+
+.boton-mas:hover,
+.boton-mas.abierto {
+  background-color: #f0f0f0;
+}
+
+.boton-mas .flecha {
+  margin-left: 4px;
+  font-size: 12px;
+
+  transition: transform 0.2s;
+}
+
+.boton-mas.abierto .flecha {
+  transform: rotate(180deg);
+}
+
+.lista-extras {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+
+  z-index: 100;
+
+  min-width: 210px;
+
+  background-color: #ffffff;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+
+  padding: 6px;
+
+  display: none;
+}
+
+.lista-extras.visible {
+  display: flex;
+  flex-direction: column;
+}
+
+.lista-extras a {
+  text-decoration: none;
+  color: #444;
+
+  padding: 10px 14px;
+
+  border-radius: 6px;
+
+  transition: 0.2s;
+}
+
+.lista-extras a:hover {
+  background-color: #f0f0f0;
+}
+
+.lista-extras a.activo {
+  background-color: #e8e8e8;
+  color: #000;
+  font-weight: 600;
+}
+
+/* Usuario */
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.usuario-info {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.nombre {
+  font-weight: 600;
+}
+
+.rol {
+  font-size: 12px;
+  color: #777;
+}
+
+.usuario button {
+  border: none;
+  background: none;
+
+  cursor: pointer;
+
+  color: #b00020;
+  font-weight: 500;
+}
+
+.usuario button:hover {
+  text-decoration: underline;
+}
+
+/* Contenido */
+.contenido {
+  padding: 30px;
+}

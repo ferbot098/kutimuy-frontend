@@ -1,0 +1,148 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Clientes</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar cliente' : 'Registrar cliente' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="nombres">Nombres</label>
+          <input
+            id="nombres"
+            type="text"
+            name="nombres"
+            [(ngModel)]="cliente.nombres"
+            placeholder="Ingrese los nombres"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="apellidos">Apellidos</label>
+          <input
+            id="apellidos"
+            type="text"
+            name="apellidos"
+            [(ngModel)]="cliente.apellidos"
+            placeholder="Ingrese los apellidos"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="documento">Documento</label>
+          <input
+            id="documento"
+            type="text"
+            name="documento"
+            [(ngModel)]="cliente.documento"
+            placeholder="DNI / RUC / Pasaporte"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            type="text"
+            name="telefono"
+            [(ngModel)]="cliente.telefono"
+            placeholder="Ingrese el teléfono">
+        </div>
+
+        <div class="campo">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            [(ngModel)]="cliente.email"
+            placeholder="Ingrese el email">
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar cliente' : 'Registrar cliente') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Clientes registrados</h2>
+
+      @if (clientes.length === 0) {
+        <p class="sin-datos">No hay clientes registrados.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Documento</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of clientes; track c.idCliente) {
+              <tr>
+                <td>{{ c.nombres }}</td>
+                <td>{{ c.apellidos }}</td>
+                <td>{{ c.documento }}</td>
+                <td>{{ c.telefono || '—' }}</td>
+                <td>{{ c.email || '—' }}</td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(c)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(c)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>

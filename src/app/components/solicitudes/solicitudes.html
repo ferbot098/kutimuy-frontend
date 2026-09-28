@@ -1,0 +1,148 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Solicitudes</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar solicitud' : 'Registrar solicitud' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="idCliente">Cliente</label>
+          <select id="idCliente" name="idCliente" [(ngModel)]="form.idCliente" required>
+            <option [ngValue]="0">Seleccione un cliente</option>
+            @for (c of clientes; track c.idCliente) {
+              <option [ngValue]="c.idCliente">{{ c.nombres }} {{ c.apellidos }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="tipo">Tipo</label>
+          <select id="tipo" name="tipo" [(ngModel)]="form.tipo">
+            @for (tipo of tipos; track tipo) {
+              <option [value]="tipo">{{ tipo }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="fecha">Fecha</label>
+          <input
+            id="fecha"
+            type="date"
+            name="fecha"
+            [(ngModel)]="form.fecha"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" [(ngModel)]="form.estado">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ estado }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="observaciones">Observaciones</label>
+          <textarea
+            id="observaciones"
+            name="observaciones"
+            [(ngModel)]="form.observaciones"
+            placeholder="Detalle de la solicitud"></textarea>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar solicitud' : 'Registrar solicitud') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Solicitudes registradas</h2>
+
+      @if (solicitudes.length === 0) {
+        <p class="sin-datos">No hay solicitudes registradas.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Tipo</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Observaciones</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of solicitudes; track s.idSolicitud) {
+              <tr>
+                <td>{{ s.idSolicitud }}</td>
+                <td>{{ s.cliente.nombres }} {{ s.cliente.apellidos }}</td>
+                <td>{{ s.tipo }}</td>
+                <td>{{ s.fecha }}</td>
+                <td>
+                  <span class="estado" [class.inactivo]="s.estado === 'CANCELADA'">
+                    {{ s.estado }}
+                  </span>
+                </td>
+                <td>{{ s.observaciones || '—' }}</td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(s)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(s)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,187 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Cotizaciones</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar cotización' : 'Registrar cotización' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="idCliente">Cliente</label>
+          <select id="idCliente" name="idCliente" [(ngModel)]="form.idCliente" required>
+            <option [ngValue]="0">Seleccione un cliente</option>
+            @for (c of clientes; track c.idCliente) {
+              <option [ngValue]="c.idCliente">{{ c.nombres }} {{ c.apellidos }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="fecha">Fecha</label>
+          <input
+            id="fecha"
+            type="date"
+            name="fecha"
+            [(ngModel)]="form.fecha"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="validezHasta">Validez hasta</label>
+          <input
+            id="validezHasta"
+            type="date"
+            name="validezHasta"
+            [min]="form.fecha"
+            [(ngModel)]="form.validezHasta">
+        </div>
+
+        <div class="campo">
+          <label for="subtotal">Subtotal (S/)</label>
+          <input
+            id="subtotal"
+            type="number"
+            name="subtotal"
+            min="0"
+            step="0.01"
+            [(ngModel)]="form.subtotal"
+            (ngModelChange)="calcularTotal()"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="descuento">Descuento (S/)</label>
+          <input
+            id="descuento"
+            type="number"
+            name="descuento"
+            min="0"
+            step="0.01"
+            [(ngModel)]="form.descuento"
+            (ngModelChange)="calcularTotal()">
+        </div>
+
+        <div class="campo">
+          <label for="total">Total (S/)</label>
+          <input
+            id="total"
+            type="number"
+            name="total"
+            step="0.01"
+            [(ngModel)]="form.total"
+            readonly>
+        </div>
+
+        <div class="campo">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" [(ngModel)]="form.estado">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ estado }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="observaciones">Observaciones</label>
+          <textarea
+            id="observaciones"
+            name="observaciones"
+            [(ngModel)]="form.observaciones"
+            placeholder="Detalle de la cotización"></textarea>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar cotización' : 'Registrar cotización') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Cotizaciones registradas</h2>
+
+      @if (cotizaciones.length === 0) {
+        <p class="sin-datos">No hay cotizaciones registradas.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Subtotal</th>
+              <th>Descuento</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of cotizaciones; track c.idCotizacion) {
+              <tr>
+                <td>{{ c.idCotizacion }}</td>
+                <td>{{ c.cliente.nombres }} {{ c.cliente.apellidos }}</td>
+                <td>{{ c.fecha }}</td>
+                <td>S/ {{ c.subtotal.toFixed(2) }}</td>
+                <td>S/ {{ c.descuento.toFixed(2) }}</td>
+                <td class="monto">S/ {{ c.total.toFixed(2) }}</td>
+                <td>
+                  <span class="estado" [class.inactivo]="c.estado === 'RECHAZADA'">
+                    {{ c.estado }}
+                  </span>
+                </td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(c)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(c)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>

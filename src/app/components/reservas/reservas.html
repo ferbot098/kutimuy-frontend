@@ -1,0 +1,196 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Reservas</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar reserva' : 'Registrar reserva' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="idCliente">Cliente</label>
+          <select id="idCliente" name="idCliente" [(ngModel)]="form.idCliente" required>
+            <option [ngValue]="0">Seleccione un cliente</option>
+            @for (c of clientes; track c.idCliente) {
+              <option [ngValue]="c.idCliente">{{ c.nombres }} {{ c.apellidos }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="idCabana">Cabaña</label>
+          <select id="idCabana" name="idCabana" [(ngModel)]="form.idCabana" required>
+            <option [ngValue]="0">Seleccione una cabaña</option>
+            @for (h of cabanas; track h.idCabana) {
+              <option [ngValue]="h.idCabana">{{ h.numero }} - {{ h.tipo }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="idCotizacion">Cotización (opcional)</label>
+          <select id="idCotizacion" name="idCotizacion" [(ngModel)]="form.idCotizacion">
+            <option [ngValue]="0">Sin cotización</option>
+            @for (co of cotizaciones; track co.idCotizacion) {
+              <option [ngValue]="co.idCotizacion">
+                #{{ co.idCotizacion }} - {{ co.cliente.nombres }} {{ co.cliente.apellidos }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="fechaEntrada">Fecha de entrada</label>
+          <input
+            id="fechaEntrada"
+            type="date"
+            name="fechaEntrada"
+            [min]="hoy"
+            [(ngModel)]="form.fechaEntrada"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="fechaSalida">Fecha de salida</label>
+          <input
+            id="fechaSalida"
+            type="date"
+            name="fechaSalida"
+            [min]="form.fechaEntrada"
+            [(ngModel)]="form.fechaSalida"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="adultos">Adultos</label>
+          <input
+            id="adultos"
+            type="number"
+            name="adultos"
+            min="1"
+            [(ngModel)]="form.adultos"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="ninos">Niños</label>
+          <input
+            id="ninos"
+            type="number"
+            name="ninos"
+            min="0"
+            [(ngModel)]="form.ninos">
+        </div>
+
+        <div class="campo">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" [(ngModel)]="form.estado">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ estado }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="observaciones">Observaciones</label>
+          <textarea
+            id="observaciones"
+            name="observaciones"
+            [(ngModel)]="form.observaciones"
+            placeholder="Notas de la reserva"></textarea>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar reserva' : 'Registrar reserva') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Reservas registradas</h2>
+
+      @if (reservas.length === 0) {
+        <p class="sin-datos">No hay reservas registradas.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Cabaña</th>
+              <th>Entrada</th>
+              <th>Salida</th>
+              <th>Estado</th>
+              <th>Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of reservas; track r.idReserva) {
+              <tr>
+                <td>{{ r.idReserva }}</td>
+                <td>{{ r.cliente.nombres }} {{ r.cliente.apellidos }}</td>
+                <td>{{ r.cabana.numero }}</td>
+                <td>{{ r.fechaEntrada }}</td>
+                <td>{{ r.fechaSalida }}</td>
+                <td>
+                  <span class="estado" [class.inactivo]="r.estado !== 'CONFIRMADA' && r.estado !== 'EN CURSO'">
+                    {{ r.estado }}
+                  </span>
+                </td>
+                <td class="monto">S/ {{ (r.total ?? 0).toFixed(2) }}</td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(r)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(r)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>
