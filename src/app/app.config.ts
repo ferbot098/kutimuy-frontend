@@ -1,5 +1,6 @@
 import {
   ApplicationConfig,
+  provideZoneChangeDetection,
   provideBrowserGlobalErrorListeners
 } from '@angular/core';
 
@@ -11,6 +12,7 @@ import { authInterceptor } from './services/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor]))
