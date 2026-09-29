@@ -25,7 +25,7 @@
           <select id="idReserva" name="idReserva" [(ngModel)]="form.idReserva" required>
             <option [ngValue]="0">Seleccione una reserva</option>
             @for (r of reservas; track r.idReserva) {
-              <option [ngValue]="r.idReserva">#{{ r.idReserva }} - {{ r.cliente.nombres }}</option>
+              <option [ngValue]="r.idReserva">#{{ r.idReserva }} - {{ r.cliente.nombres }} {{ r.cliente.apellidos }}</option>
             }
           </select>
         </div>
@@ -41,7 +41,7 @@
         </div>
 
         <div class="campo">
-          <label for="metodo">Método</label>
+          <label for="metodo">Método de Cobro</label>
           <select id="metodo" name="metodo" [(ngModel)]="form.metodo">
             @for (metodo of metodos; track metodo) {
               <option [value]="metodo">{{ metodo }}</option>
@@ -50,16 +50,69 @@
         </div>
 
         <div class="campo">
-          <label for="monto">Monto (S/)</label>
+          <label for="monto">Monto a Cobrar (S/)</label>
           <input
             id="monto"
             type="number"
             name="monto"
-            min="0"
+            min="0.01"
             step="0.01"
             [(ngModel)]="form.monto"
+            (input)="calcularVuelto()"
             required>
         </div>
+
+        <!-- SECCIÓN DINÁMICA: YAPE O PLIN -->
+        @if (form.metodo === 'YAPE' || form.metodo === 'PLIN') {
+          <div style="background: #eef7fc; border: 1px solid #bce1f5; border-radius: 8px; padding: 14px; margin-bottom: 15px; text-align: center;">
+            <p style="margin: 0 0 6px 0; font-weight: bold; color: #084298;">Escanear QR Oficial de {{ form.metodo }}</p>
+            <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=KutimuyHotelPago'" alt="QR de Pago" style="border: 2px solid white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">Kutimuy Hotel S.A.C. &bull; <strong>987 654 321</strong></p>
+            
+            <div style="margin-top: 10px; text-align: left;">
+              <label style="font-size: 12px; font-weight: 600;">Celular de confirmación (Huésped):</label>
+              <input type="text" [(ngModel)]="celularRemitente" name="celularRemitente" placeholder="Ej. 998877665" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
+            </div>
+          </div>
+        }
+
+        <!-- SECCIÓN DINÁMICA: TARJETA DE CRÉDITO / DÉBITO -->
+        @if (form.metodo === 'TARJETA') {
+          <div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; font-weight: bold; color: #333;">Pasarela de Tarjeta (POS Virtual)</span>
+              <span style="font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 4px;">Modo Simulado</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <label style="font-size: 12px;">Número de Tarjeta</label>
+              <input type="text" maxlength="16" [(ngModel)]="tarjetaNumero" name="tarjetaNumero" placeholder="4557 1234 5678 9012" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: monospace;">
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div style="flex: 1;">
+                <label style="font-size: 12px;">Vence (MM/AA)</label>
+                <input type="text" maxlength="5" [(ngModel)]="tarjetaVencimiento" name="tarjetaVencimiento" placeholder="12/28" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc;">
+              </div>
+              <div style="flex: 1;">
+                <label style="font-size: 12px;">CVV</label>
+                <input type="password" maxlength="3" [(ngModel)]="tarjetaCvv" name="tarjetaCvv" placeholder="•••" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc;">
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- SECCIÓN DINÁMICA: EFECTIVO CON CÁLCULO DE VUELTO -->
+        @if (form.metodo === 'EFECTIVO') {
+          <div style="background: #f8f9fa; border: 1px dashed #adb5bd; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+            <div style="margin-bottom: 8px;">
+              <label style="font-size: 12px; font-weight: 600;">Efectivo Entregado por Huésped (S/):</label>
+              <input type="number" min="0" step="0.01" [(ngModel)]="efectivoRecibido" name="efectivoRecibido" (input)="calcularVuelto()" placeholder="0.00" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc;">
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; color: #198754;">
+              <span>Vuelto a devolver:</span>
+              <span>S/ {{ vuelto.toFixed(2) }}</span>
+            </div>
+          </div>
+        }
 
         <div class="campo">
           <label for="estado">Estado</label>
@@ -71,20 +124,20 @@
         </div>
 
         <div class="campo">
-          <label for="referencia">Referencia</label>
+          <label for="referencia">Nº de Operación / Referencia (Opcional)</label>
           <input
             id="referencia"
             type="text"
             name="referencia"
             [(ngModel)]="form.referencia"
-            placeholder="Nº de operación / voucher">
+            placeholder="Dejar vacío para generar código automático">
         </div>
 
         <div class="acciones-formulario">
           <button
             type="submit"
-            [disabled]="cargando">
-            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar pago' : 'Registrar pago') }}
+            [disabled]="cargando || procesandoSimulacion">
+            {{ procesandoSimulacion ? 'Procesando con pasarela...' : (editando ? 'Actualizar pago' : 'Procesar Pago') }}
           </button>
 
           @if (editando) {
@@ -118,7 +171,7 @@
               <th>Método</th>
               <th>Monto</th>
               <th>Estado</th>
-              <th>Referencia</th>
+              <th>Referencia / Voucher</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -128,14 +181,14 @@
                 <td>{{ p.idPago }}</td>
                 <td>#{{ p.reserva.idReserva }}</td>
                 <td>{{ p.fechaPago }}</td>
-                <td>{{ p.metodo }}</td>
+                <td><strong>{{ p.metodo }}</strong></td>
                 <td class="monto">S/ {{ p.monto.toFixed(2) }}</td>
                 <td>
-                  <span class="estado" [class.inactivo]="p.estado !== 'PAGADO'">
+                  <span class="estado" [class.inactivo]="p.estado !== 'PAGADO' && p.estado !== 'COMPLETADO'">
                     {{ p.estado }}
                   </span>
                 </td>
-                <td>{{ p.referencia || '—' }}</td>
+                <td style="font-family: monospace; font-size: 13px;">{{ p.referencia || '—' }}</td>
                 <td class="acciones-tabla">
                   <button
                     type="button"
@@ -159,5 +212,40 @@
     </div>
 
   </div>
+
+  <!-- MODAL / VOUCHER DIGITAL DE PAGO SIMULADO -->
+  @if (mostrarComprobante && comprobanteActual) {
+    <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+      <div style="background: white; border-radius: 12px; padding: 25px; max-width: 380px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-family: monospace;">
+        <div style="text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 12px;">
+          <h2 style="margin: 0; font-size: 20px; font-weight: bold;">HOTEL KUTIMUY</h2>
+          <p style="margin: 2px 0 0 0; font-size: 12px; color: #666;">Comprobante Electrónico de Pago</p>
+        </div>
+
+        <div style="margin: 15px 0; font-size: 13px; line-height: 1.6;">
+          <div><strong>Ticket Nº:</strong> 00{{ comprobanteActual.idPago }}</div>
+          <div><strong>Fecha / Hora:</strong> {{ comprobanteActual.fecha }}</div>
+          <div><strong>Reserva Asociada:</strong> #{{ comprobanteActual.idReserva }}</div>
+          <div style="word-break: break-word;"><strong>Huésped:</strong> {{ comprobanteActual.cliente }}</div>
+          <div style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px;"><strong>Método:</strong> {{ comprobanteActual.metodo }}</div>
+          <div><strong>Operación / Ref:</strong> <span style="background: #eef2ff; color: #3730a3; padding: 2px 4px; border-radius: 4px;">{{ comprobanteActual.referencia }}</span></div>
+          <div style="margin-top: 8px; font-size: 16px; font-weight: bold; border-top: 1px solid #eee; padding-top: 8px; display: flex; justify-content: space-between;">
+            <span>TOTAL PAGADO:</span>
+            <span>S/ {{ comprobanteActual.monto.toFixed(2) }}</span>
+          </div>
+          @if (comprobanteActual.vuelto > 0) {
+            <div style="font-size: 12px; color: #198754; text-align: right;">
+              Vuelto entregado: S/ {{ comprobanteActual.vuelto.toFixed(2) }}
+            </div>
+          }
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; display: flex; gap: 10px;">
+          <button type="button" (click)="imprimirComprobante()" style="flex: 1; padding: 8px; background: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">Imprimir</button>
+          <button type="button" (click)="cerrarComprobante()" style="flex: 1; padding: 8px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  }
 
 </div>

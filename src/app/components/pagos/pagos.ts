@@ -31,11 +31,26 @@ export class Pagos implements OnInit {
   form: PagoForm = this.formVacio();
   editando: boolean = false;
   cargando: boolean = false;
+  procesandoSimulacion: boolean = false;
   mensaje: string = '';
   mensajeExito: string = '';
 
-  metodos = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'YAPE', 'PLIN'];
-  estados = ['PENDIENTE', 'PAGADO', 'RECHAZADO', 'REEMBOLSADO'];
+  metodos = ['EFECTIVO', 'TARJETA', 'YAPE', 'PLIN', 'TRANSFERENCIA'];
+  estados = ['PAGADO', 'PENDIENTE', 'RECHAZADO', 'REEMBOLSADO'];
+
+  // Variables para la simulación realista
+  efectivoRecibido: number = 0;
+  vuelto: number = 0;
+
+  tarjetaNumero: string = '';
+  tarjetaVencimiento: string = '';
+  tarjetaCvv: string = '';
+
+  celularRemitente: string = '';
+
+  // Control del Comprobante / Ticket Digital
+  mostrarComprobante: boolean = false;
+  comprobanteActual: any = null;
 
   constructor(
     private pagoService: PagoService,
@@ -51,12 +66,19 @@ export class Pagos implements OnInit {
   }
 
   formVacio(): PagoForm {
+    this.efectivoRecibido = 0;
+    this.vuelto = 0;
+    this.tarjetaNumero = '';
+    this.tarjetaVencimiento = '';
+    this.tarjetaCvv = '';
+    this.celularRemitente = '';
+
     return {
       idReserva: 0,
       fechaPago: this.ahoraLocal(),
       metodo: 'EFECTIVO',
       monto: 0,
-      estado: 'PENDIENTE',
+      estado: 'PAGADO',
       referencia: ''
     };
   }
@@ -78,13 +100,50 @@ export class Pagos implements OnInit {
     });
   }
 
-  guardar(): void {
+  calcularVuelto(): void {
+    if (this.efectivoRecibido >= this.form.monto) {
+      this.vuelto = Number((this.efectivoRecibido - this.form.monto).toFixed(2));
+    } else {
+      this.vuelto = 0;
+    }
+  }
 
+  guardar(): void {
     this.mensaje = '';
 
-    if (!this.form.idReserva || !this.form.monto || this.form.monto < 0) {
-      this.mensaje = 'Complete los campos obligatorios';
+    if (!this.form.idReserva || !this.form.monto || this.form.monto <= 0) {
+      this.mensaje = 'Seleccione una reserva e ingrese un monto válido';
       return;
+    }
+
+    // Validaciones específicas de simulación
+    if (this.form.metodo === 'EFECTIVO' && this.efectivoRecibido > 0 && this.efectivoRecibido < this.form.monto) {
+      this.mensaje = 'El monto entregado en efectivo es menor al total a pagar';
+      return;
+    }
+
+    if (this.form.metodo === 'TARJETA' && !this.editando) {
+      if (this.tarjetaNumero.replace(/\s/g, '').length < 16 || !this.tarjetaVencimiento || this.tarjetaCvv.length < 3) {
+        this.mensaje = 'Complete todos los datos de la tarjeta (16 dígitos, exp, CVV)';
+        return;
+      }
+    }
+
+    // Generación de referencia simulada si el usuario no ingresó una manual
+    let referenciaFinal = this.form.referencia;
+    const numRandom = Math.floor(100000 + Math.random() * 900000);
+
+    if (!referenciaFinal) {
+      if (this.form.metodo === 'TARJETA') {
+        const ultimos4 = this.tarjetaNumero.replace(/\s/g, '').slice(-4) || '9012';
+        referenciaFinal = `AUTH-${numRandom} (**** ${ultimos4})`;
+      } else if (this.form.metodo === 'YAPE') {
+        referenciaFinal = `YAP-${numRandom}`;
+      } else if (this.form.metodo === 'PLIN') {
+        referenciaFinal = `PLN-${numRandom}`;
+      } else {
+        referenciaFinal = `EFE-${numRandom}`;
+      }
     }
 
     const pago: Pago = {
@@ -93,40 +152,68 @@ export class Pagos implements OnInit {
       metodo: this.form.metodo,
       monto: this.form.monto,
       estado: this.form.estado,
-      referencia: this.form.referencia
+      referencia: referenciaFinal
     };
 
+    // Simulación de latencia de red bancaria (1.2 segundos)
     this.cargando = true;
+    this.procesandoSimulacion = true;
 
-    const accion = this.editando
-      ? this.pagoService.actualizar(this.form.idPago!, pago)
-      : this.pagoService.crear(pago);
+    setTimeout(() => {
+      const accion = this.editando
+        ? this.pagoService.actualizar(this.form.idPago!, pago)
+        : this.pagoService.crear(pago);
 
-    accion.subscribe({
-      next: () => {
-        this.cargando = false;
+      accion.subscribe({
+        next: (pagoGuardado: Pago) => {
+          this.cargando = false;
+          this.procesandoSimulacion = false;
 
-        this.mensajeExito = this.editando
-          ? 'Pago actualizado correctamente'
-          : 'Pago registrado correctamente';
+          const reservaSel = this.reservas.find(r => r.idReserva === pagoGuardado.reserva?.idReserva);
 
-        this.cancelarEdicion();
-        this.listar();
+          // Concatenación de nombres y apellidos completos
+          const nombres = reservaSel?.cliente?.nombres || '';
+          const apellidos = reservaSel?.cliente?.apellidos || '';
+          const clienteNombreCompleto = `${nombres} ${apellidos}`.trim() || 'Huésped Kutimuy';
 
-        setTimeout(() => {
-          this.mensajeExito = '';
-        }, 3000);
-      },
-      error: (error: any) => {
-        this.cargando = false;
+          // Preparar datos del voucher/comprobante emitido
+          this.comprobanteActual = {
+            idPago: pagoGuardado.idPago,
+            cliente: clienteNombreCompleto,
+            idReserva: pagoGuardado.reserva?.idReserva,
+            fecha: pagoGuardado.fechaPago,
+            metodo: pagoGuardado.metodo,
+            monto: pagoGuardado.monto,
+            referencia: pagoGuardado.referencia,
+            vuelto: this.vuelto
+          };
 
-        if (error.status === 400 || error.status === 500) {
-          this.mensaje = error.error?.mensaje || 'Error al guardar el pago';
-        } else {
-          this.mensaje = 'Error al guardar el pago';
+          this.mostrarComprobante = true;
+          this.mensajeExito = this.editando ? 'Pago actualizado con éxito' : 'Pago procesado y aprobado exitosamente';
+
+          this.cancelarEdicion();
+          this.listar();
+
+          setTimeout(() => {
+            this.mensajeExito = '';
+          }, 4000);
+        },
+        error: (error: any) => {
+          this.cargando = false;
+          this.procesandoSimulacion = false;
+          this.mensaje = error.error?.mensaje || 'Error al procesar la transacción';
         }
-      }
-    });
+      });
+    }, 1200);
+  }
+
+  cerrarComprobante(): void {
+    this.mostrarComprobante = false;
+    this.comprobanteActual = null;
+  }
+
+  imprimirComprobante(): void {
+    window.print();
   }
 
   editar(pago: Pago): void {
@@ -145,7 +232,6 @@ export class Pagos implements OnInit {
   }
 
   eliminar(pago: Pago): void {
-
     if (!confirm(`¿Eliminar el pago #${pago.idPago}?`)) {
       return;
     }
@@ -153,16 +239,11 @@ export class Pagos implements OnInit {
     this.pagoService.eliminar(pago.idPago!).subscribe({
       next: () => {
         this.mensajeExito = 'Pago eliminado correctamente';
-
         if (this.editando && this.form.idPago === pago.idPago) {
           this.cancelarEdicion();
         }
-
         this.listar();
-
-        setTimeout(() => {
-          this.mensajeExito = '';
-        }, 3000);
+        setTimeout(() => { this.mensajeExito = ''; }, 3000);
       },
       error: () => {
         this.mensaje = 'Error al eliminar el pago';
