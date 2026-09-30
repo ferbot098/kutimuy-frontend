@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import { Cabana } from '../../models/cabana';
 import { Cliente } from '../../models/cliente';
@@ -26,7 +27,7 @@ interface ReservaForm {
 
 @Component({
   selector: 'app-reservas',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './reservas.html',
   styleUrl: './reservas.css'
 })
@@ -42,6 +43,7 @@ export class Reservas implements OnInit {
   cargando: boolean = false;
   mensaje: string = '';
   mensajeExito: string = '';
+  mostrarBotonPagos: boolean = false;
 
   estados = ['PENDIENTE', 'CONFIRMADA', 'EN CURSO', 'FINALIZADA', 'CANCELADA'];
   hoy = new Date().toISOString().slice(0, 10);
@@ -95,8 +97,8 @@ export class Reservas implements OnInit {
   }
 
   guardar(): void {
-
     this.mensaje = '';
+    this.mostrarBotonPagos = false;
 
     if (!this.form.idCliente || !this.form.idCabana || !this.form.fechaEntrada || !this.form.fechaSalida) {
       this.mensaje = 'Complete los campos obligatorios';
@@ -151,6 +153,7 @@ export class Reservas implements OnInit {
   editar(reserva: Reserva): void {
     this.editando = true;
     this.mensaje = '';
+    this.mostrarBotonPagos = false;
 
     this.form = {
       idReserva: reserva.idReserva,
@@ -167,6 +170,9 @@ export class Reservas implements OnInit {
   }
 
   eliminar(reserva: Reserva): void {
+    this.mensaje = '';
+    this.mensajeExito = '';
+    this.mostrarBotonPagos = false;
 
     if (!confirm(`¿Eliminar la reserva #${reserva.idReserva}?`)) {
       return;
@@ -186,8 +192,17 @@ export class Reservas implements OnInit {
           this.mensajeExito = '';
         }, 3000);
       },
-      error: () => {
-        this.mensaje = 'Error al eliminar la reserva';
+      error: (err: any) => {
+        if (err.status === 409) {
+          this.mensaje = err.error?.mensaje || `No se puede eliminar la reserva #${reserva.idReserva} porque tiene dependencias activas.`;
+          this.mostrarBotonPagos = true;
+        } else if (err.error?.mensaje) {
+          this.mensaje = err.error.mensaje;
+        } else if (typeof err.error === 'string') {
+          this.mensaje = err.error;
+        } else {
+          this.mensaje = `No se pudo eliminar la reserva #${reserva.idReserva}. Intente nuevamente.`;
+        }
       }
     });
   }

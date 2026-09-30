@@ -27,6 +27,34 @@
   border: 1px solid #fca5a5;
 }
 
+/* Alineación para mensajes con botón de acción */
+.aviso-accion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Botón de acceso directo hacia el módulo de Pagos */
+.btn-ir-pagos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #dc2626;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.btn-ir-pagos:hover {
+  background: #b91c1c;
+}
+
 .panel {
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -183,5 +211,14 @@ button.eliminar {
 @media (max-width: 900px) {
   .panel {
     grid-template-columns: 1fr;
+  }
+
+  .aviso-accion {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-ir-pagos {
+    width: 100%;
   }
 }

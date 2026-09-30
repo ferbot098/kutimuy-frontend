@@ -9,7 +9,12 @@
   }
 
   @if (mensaje) {
-    <div class="aviso error">{{ mensaje }}</div>
+    <div class="aviso error aviso-accion">
+      <span>{{ mensaje }}</span>
+      @if (mostrarBotonPagos) {
+        <a routerLink="/pagos" class="btn-ir-pagos">Ir a Pagos</a>
+      }
+    </div>
   }
 
   <div class="panel">
