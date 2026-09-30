@@ -16,6 +16,7 @@ import { Cotizaciones } from './components/cotizaciones/cotizaciones';
 import { Canales } from './components/canales/canales';
 import { TiposEvento } from './components/tipos-evento/tipos-evento';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
 
@@ -38,10 +39,11 @@ export const routes: Routes = [
         component: Inicio
       },
 
-      // 01 - Usuarios
+      // 01 - Usuarios (Solo accesible para ADMINISTRADOR)
       {
         path: 'usuarios',
-        component: Usuario
+        component: Usuario,
+        canActivate: [adminGuard]
       },
 
       // 02 - Clientes
