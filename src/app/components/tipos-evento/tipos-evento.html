@@ -1,0 +1,126 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Tipos de Evento</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar tipo de evento' : 'Registrar tipo de evento' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input
+            id="nombre"
+            type="text"
+            name="nombre"
+            [(ngModel)]="tipoEvento.nombre"
+            placeholder="Ej: Boda, Cumpleaños, Conferencia"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            [(ngModel)]="tipoEvento.descripcion"
+            placeholder="Detalle del tipo de evento"></textarea>
+        </div>
+
+        <div class="campo-check">
+          <label for="activo">
+            <input
+              id="activo"
+              type="checkbox"
+              name="activo"
+              [(ngModel)]="tipoEvento.activo">
+            Tipo de evento activo
+          </label>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar tipo de evento' : 'Registrar tipo de evento') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Tipos de evento registrados</h2>
+
+      @if (tiposEvento.length === 0) {
+        <p class="sin-datos">No hay tipos de evento registrados.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Activo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of tiposEvento; track t.idTipoEvento) {
+              <tr>
+                <td>{{ t.nombre }}</td>
+                <td>{{ t.descripcion || '—' }}</td>
+                <td>
+                  <span class="estado" [class.inactivo]="!t.activo">
+                    {{ t.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(t)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(t)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>

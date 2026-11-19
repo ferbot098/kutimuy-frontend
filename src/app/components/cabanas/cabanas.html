@@ -1,0 +1,151 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Cabañas</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar cabaña' : 'Registrar cabaña' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="numero">Número</label>
+          <input
+            id="numero"
+            type="text"
+            name="numero"
+            [(ngModel)]="cabana.numero"
+            placeholder="Ej: 101"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="tipo">Tipo</label>
+          <select id="tipo" name="tipo" [(ngModel)]="cabana.tipo">
+            @for (tipo of tipos; track tipo) {
+              <option [value]="tipo">{{ tipo }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="capacidad">Capacidad</label>
+          <input
+            id="capacidad"
+            type="number"
+            name="capacidad"
+            min="1"
+            [(ngModel)]="cabana.capacidad"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="tarifaNoche">Tarifa por noche (S/)</label>
+          <input
+            id="tarifaNoche"
+            type="number"
+            name="tarifaNoche"
+            min="0"
+            step="0.01"
+            [(ngModel)]="cabana.tarifaNoche"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" [(ngModel)]="cabana.estado">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ estado }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar cabaña' : 'Registrar cabaña') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Cabañas registradas</h2>
+
+      @if (cabanas.length === 0) {
+        <p class="sin-datos">No hay cabañas registradas.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nº</th>
+              <th>Tipo</th>
+              <th>Capacidad</th>
+              <th>Tarifa/noche</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of cabanas; track c.idCabana) {
+              <tr>
+                <td>{{ c.numero }}</td>
+                <td>{{ c.tipo }}</td>
+                <td>{{ c.capacidad }}</td>
+                <td>S/ {{ c.tarifaNoche.toFixed(2) }}</td>
+                <td>
+                  <span class="estado" [class.inactivo]="c.estado !== 'DISPONIBLE'">
+                    {{ c.estado }}
+                  </span>
+                </td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(c)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(c)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>

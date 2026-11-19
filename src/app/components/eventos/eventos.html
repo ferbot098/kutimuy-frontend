@@ -1,0 +1,191 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Eventos</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar evento' : 'Registrar evento' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="idReserva">Reserva</label>
+          <select id="idReserva" name="idReserva" [(ngModel)]="form.idReserva" required>
+            <option [ngValue]="0">Seleccione una reserva</option>
+            @for (r of reservas; track r.idReserva) {
+              <option [ngValue]="r.idReserva">#{{ r.idReserva }} - {{ r.cliente.nombres }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="idEspacio">Espacio</label>
+          <select id="idEspacio" name="idEspacio" [(ngModel)]="form.idEspacio" required>
+            <option [ngValue]="0">Seleccione un espacio</option>
+            @for (e of espacios; track e.idEspacio) {
+              <option [ngValue]="e.idEspacio">{{ e.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="nombre">Nombre del evento</label>
+          <input
+            id="nombre"
+            type="text"
+            name="nombre"
+            [(ngModel)]="form.nombre"
+            placeholder="Ej: Bodas de María y Juan"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="tipo">Tipo de evento</label>
+          <select id="tipo" name="tipo" [(ngModel)]="form.tipo" required>
+            <option value="">Seleccione un tipo</option>
+            @for (t of tiposEvento; track t.idTipoEvento) {
+              <option [value]="t.nombre">{{ t.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="asistentes">Asistentes</label>
+          <input
+            id="asistentes"
+            type="number"
+            name="asistentes"
+            min="1"
+            [(ngModel)]="form.asistentes"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="fechaInicio">Inicio</label>
+          <input
+            id="fechaInicio"
+            type="datetime-local"
+            name="fechaInicio"
+            [(ngModel)]="form.fechaInicio"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="fechaFin">Fin</label>
+          <input
+            id="fechaFin"
+            type="datetime-local"
+            name="fechaFin"
+            [(ngModel)]="form.fechaFin"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" [(ngModel)]="form.estado">
+            @for (estado of estados; track estado) {
+              <option [value]="estado">{{ estado }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="notas">Notas</label>
+          <textarea
+            id="notas"
+            name="notas"
+            [(ngModel)]="form.notas"
+            placeholder="Detalles del evento"></textarea>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar evento' : 'Registrar evento') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Eventos registrados</h2>
+
+      @if (eventos.length === 0) {
+        <p class="sin-datos">No hay eventos registrados.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Reserva</th>
+              <th>Espacio</th>
+              <th>Tipo</th>
+              <th>Inicio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of eventos; track e.idEvento) {
+              <tr>
+                <td>{{ e.nombre }}</td>
+                <td>#{{ e.reserva.idReserva }}</td>
+                <td>{{ e.espacio.nombre }}</td>
+                <td>{{ e.tipo }}</td>
+                <td>{{ e.fechaInicio }}</td>
+                <td>
+                  <span class="estado" [class.inactivo]="e.estado === 'CANCELADO'">
+                    {{ e.estado }}
+                  </span>
+                </td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(e)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(e)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>

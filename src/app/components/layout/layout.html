@@ -1,0 +1,72 @@
+<div class="layout">
+
+  <header class="barra-superior">
+
+    <div class="marca">
+      <strong>Kutimuy</strong>
+      <span>Hotel</span>
+    </div>
+
+    <nav class="menu">
+
+      @for (item of menuPrincipal; track item.ruta) {
+        <a
+          routerLink="{{ item.ruta }}"
+          routerLinkActive="activo"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="cerrarMenu()">
+          {{ item.etiqueta }}
+        </a>
+      }
+
+      @if (menuExtra.length > 0) {
+        <div class="menu-desplegable" (click)="$event.stopPropagation()">
+
+          <button
+            type="button"
+            class="boton-mas"
+            [class.abierto]="menuAbierto()"
+            (click)="alternarMenu()">
+            Más
+            <span class="flecha">▾</span>
+          </button>
+
+          <div class="lista-extras" [class.visible]="menuAbierto()">
+
+            @for (item of menuExtra; track item.ruta) {
+              <a
+                routerLink="{{ item.ruta }}"
+                routerLinkActive="activo"
+                [routerLinkActiveOptions]="{ exact: true }"
+                (click)="cerrarMenu()">
+                {{ item.etiqueta }}
+              </a>
+            }
+
+          </div>
+
+        </div>
+      }
+
+    </nav>
+
+    <div class="usuario">
+
+      <div class="usuario-info">
+        <span class="nombre">{{ usuario()?.nombre }}</span>
+        <span class="rol">{{ usuario()?.rol }}</span>
+      </div>
+
+      <button type="button" (click)="cerrarSesion()">
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </header>
+
+  <main class="contenido">
+    <router-outlet />
+  </main>
+
+</div>

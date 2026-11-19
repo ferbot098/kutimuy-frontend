@@ -1,0 +1,126 @@
+<div class="contenedor">
+
+  <div class="cabecera">
+    <h1>Gestión de Canales de Origen</h1>
+  </div>
+
+  @if (mensajeExito) {
+    <div class="aviso exito">{{ mensajeExito }}</div>
+  }
+
+  @if (mensaje) {
+    <div class="aviso error">{{ mensaje }}</div>
+  }
+
+  <div class="panel">
+
+    <div class="formulario">
+
+      <h2>{{ editando ? 'Editar canal' : 'Registrar canal' }}</h2>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input
+            id="nombre"
+            type="text"
+            name="nombre"
+            [(ngModel)]="canal.nombre"
+            placeholder="Ej: Booking, Referido, Redes"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            [(ngModel)]="canal.descripcion"
+            placeholder="Detalle del canal"></textarea>
+        </div>
+
+        <div class="campo-check">
+          <label for="activo">
+            <input
+              id="activo"
+              type="checkbox"
+              name="activo"
+              [(ngModel)]="canal.activo">
+            Canal activo
+          </label>
+        </div>
+
+        <div class="acciones-formulario">
+          <button
+            type="submit"
+            [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : (editando ? 'Actualizar canal' : 'Registrar canal') }}
+          </button>
+
+          @if (editando) {
+            <button
+              type="button"
+              class="secundario"
+              (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="tabla-container">
+
+      <h2>Canales registrados</h2>
+
+      @if (canales.length === 0) {
+        <p class="sin-datos">No hay canales registrados.</p>
+      } @else {
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Activo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of canales; track c.idCanalOrigen) {
+              <tr>
+                <td>{{ c.nombre }}</td>
+                <td>{{ c.descripcion || '—' }}</td>
+                <td>
+                  <span class="estado" [class.inactivo]="!c.activo">
+                    {{ c.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="acciones-tabla">
+                  <button
+                    type="button"
+                    class="editar"
+                    (click)="editar(c)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="eliminar"
+                    (click)="eliminar(c)">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+    </div>
+
+  </div>
+
+</div>
