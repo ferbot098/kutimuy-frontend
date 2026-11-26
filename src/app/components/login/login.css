@@ -48,6 +48,26 @@
   font-size: 1rem;
 }
 
+.password-contenedor {
+  position: relative;
+}
+
+.password-contenedor input {
+  padding-right: 85px;
+}
+
+.mostrar-password {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: auto;
+  padding: 4px 8px;
+  transform: translateY(-50%);
+  background: transparent;
+  color: #2563eb;
+  font-size: 0.8rem;
+}
+
 button {
   width: 100%;
   padding: 12px;

@@ -7,7 +7,7 @@
       <span>Hotel</span>
     </div>
 
-    <nav class="menu">
+    <nav class="menu" aria-label="Navegación principal">
 
       @for (item of menuPrincipal; track item.ruta) {
         <a
@@ -20,15 +20,21 @@
       }
 
       @if (menuExtra.length > 0) {
-        <div class="menu-desplegable" (click)="$event.stopPropagation()">
+        <div
+          class="menu-desplegable"
+          (click)="$event.stopPropagation()"
+          (keydown.escape)="cerrarMenu()"
+          (keydown)="$event.stopPropagation()">
 
           <button
             type="button"
             class="boton-mas"
+            aria-haspopup="true"
+            [attr.aria-expanded]="menuAbierto()"
             [class.abierto]="menuAbierto()"
             (click)="alternarMenu()">
             Más
-            <span class="flecha">▾</span>
+            <span class="flecha" aria-hidden="true">▾</span>
           </button>
 
           <div class="lista-extras" [class.visible]="menuAbierto()">
@@ -65,7 +71,7 @@
 
   </header>
 
-  <main class="contenido">
+  <main class="contenido" id="contenido-principal">
     <router-outlet />
   </main>
 

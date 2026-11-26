@@ -1,1 +1,224 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================
+   ACCESIBILIDAD GLOBAL (ODS 10 · WCAG 2.1 AA)
+   ============================================================ */
+
+/* 1. Aumento y reducción del tamaño de la interfaz (100% - 150%) */
+.app-contenido {
+  zoom: var(--escala-interfaz, 1);
+}
+
+/* 2. Enlace para saltar al contenido principal y foco visible en teclado */
+.saltar-contenido {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 1100;
+  background-color: #1e3a5f;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid #ffffff;
+}
+
+.saltar-contenido:focus {
+  top: 16px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  outline: none;
+}
+
+/* 3. Modo de Alto Contraste */
+html.modo-alto-contraste,
+html.modo-alto-contraste body {
+  background-color: #0b1220 !important;
+  color: #ffffff !important;
+}
+
+html.modo-alto-contraste .layout,
+html.modo-alto-contraste .login-contenedor {
+  background-color: #0b1220 !important;
+  color: #ffffff !important;
+}
+
+html.modo-alto-contraste .login-caja,
+html.modo-alto-contraste .barra-superior,
+html.modo-alto-contraste .lista-extras,
+html.modo-alto-contraste .formulario,
+html.modo-alto-contraste .tabla-container,
+html.modo-alto-contraste .bloque-pago-dinamico,
+html.modo-alto-contraste .panel-accesibilidad {
+  background-color: #111b2e !important;
+  color: #ffffff !important;
+  border: 1.5px solid #facc15 !important;
+  box-shadow: none !important;
+}
+
+html.modo-alto-contraste h1,
+html.modo-alto-contraste h2,
+html.modo-alto-contraste h3,
+html.modo-alto-contraste label,
+html.modo-alto-contraste strong,
+html.modo-alto-contraste p,
+html.modo-alto-contraste span,
+html.modo-alto-contraste .panel-titulo,
+html.modo-alto-contraste .porcentaje,
+html.modo-alto-contraste .sin-datos,
+html.modo-alto-contraste .login-caja h2,
+html.modo-alto-contraste .marca span,
+html.modo-alto-contraste .rol {
+  color: #ffffff !important;
+}
+
+html.modo-alto-contraste .login-caja h2,
+html.modo-alto-contraste .marca span,
+html.modo-alto-contraste .rol,
+html.modo-alto-contraste .sin-datos,
+html.modo-alto-contraste .index-number {
+  color: #e2e8f0 !important;
+}
+
+html.modo-alto-contraste input,
+html.modo-alto-contraste select,
+html.modo-alto-contraste textarea {
+  background-color: #0b1220 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #facc15 !important;
+}
+
+html.modo-alto-contraste input::placeholder,
+html.modo-alto-contraste textarea::placeholder {
+  color: #cbd5e1 !important;
+  opacity: 1;
+}
+
+html.modo-alto-contraste button,
+html.modo-alto-contraste .btn-ir-pagos {
+  background-color: #162442 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #facc15 !important;
+}
+
+html.modo-alto-contraste button:hover:not(:disabled),
+html.modo-alto-contraste .btn-ir-pagos:hover {
+  background-color: #1e3a5f !important;
+}
+
+html.modo-alto-contraste button:disabled {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+  border-color: #64748b !important;
+}
+
+html.modo-alto-contraste button.eliminar {
+  background-color: #7f1d1d !important;
+  color: #ffffff !important;
+  border: 1.5px solid #facc15 !important;
+}
+
+html.modo-alto-contraste .menu a,
+html.modo-alto-contraste .lista-extras a,
+html.modo-alto-contraste .index-link {
+  color: #ffffff !important;
+  border: 1px solid transparent;
+}
+
+html.modo-alto-contraste .menu a:hover,
+html.modo-alto-contraste .lista-extras a:hover,
+html.modo-alto-contraste .index-link:hover {
+  background-color: #162442 !important;
+  border-color: #facc15 !important;
+}
+
+html.modo-alto-contraste .menu a.activo,
+html.modo-alto-contraste .lista-extras a.activo {
+  background-color: #1e3a5f !important;
+  color: #facc15 !important;
+  border: 1.5px solid #facc15 !important;
+}
+
+html.modo-alto-contraste .index-item {
+  border-bottom-color: #334155 !important;
+}
+
+html.modo-alto-contraste th {
+  background-color: #162442 !important;
+  color: #facc15 !important;
+  border-bottom: 1.5px solid #facc15 !important;
+}
+
+html.modo-alto-contraste td {
+  color: #ffffff !important;
+  border-bottom-color: #334155 !important;
+}
+
+html.modo-alto-contraste tbody tr:hover {
+  background-color: #1e293b !important;
+}
+
+html.modo-alto-contraste .aviso.exito,
+html.modo-alto-contraste .estado {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+  border: 1.5px solid #facc15 !important;
+}
+
+html.modo-alto-contraste .aviso.error,
+html.modo-alto-contraste .estado.inactivo {
+  background-color: #7f1d1d !important;
+  color: #ffffff !important;
+  border: 1.5px solid #facc15 !important;
+}
+
+html.modo-alto-contraste a:focus-visible,
+html.modo-alto-contraste button:focus-visible,
+html.modo-alto-contraste input:focus-visible,
+html.modo-alto-contraste select:focus-visible,
+html.modo-alto-contraste textarea:focus-visible,
+html.modo-alto-contraste [tabindex]:focus-visible {
+  outline: 3px solid #facc15 !important;
+  outline-offset: 2px;
+}
+
+/* 4. Botones grandes para discapacidad motora */
+html.modo-botones-grandes .app-contenido button,
+html.modo-botones-grandes .app-contenido .btn-ir-pagos {
+  min-height: 48px !important;
+  padding: 14px 22px !important;
+  font-size: 1.08rem !important;
+}
+
+html.modo-botones-grandes .app-contenido .mostrar-password {
+  min-height: 36px !important;
+  padding: 6px 12px !important;
+  font-size: 0.95rem !important;
+}
+
+html.modo-botones-grandes .app-contenido .acciones-tabla {
+  flex-direction: column !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+}
+
+html.modo-botones-grandes .app-contenido .acciones-tabla button {
+  min-width: 120px !important;
+  width: 100% !important;
+  padding: 14px 20px !important;
+  font-size: 1.05rem !important;
+}

@@ -27,7 +27,10 @@
             type="text"
             name="nombres"
             [(ngModel)]="cliente.nombres"
+            (input)="limitarSoloLetras($event, 'nombres')"
             placeholder="Ingrese los nombres"
+            autocomplete="given-name"
+            maxlength="100"
             required>
         </div>
 
@@ -38,7 +41,10 @@
             type="text"
             name="apellidos"
             [(ngModel)]="cliente.apellidos"
+            (input)="limitarSoloLetras($event, 'apellidos')"
             placeholder="Ingrese los apellidos"
+            autocomplete="family-name"
+            maxlength="100"
             required>
         </div>
 

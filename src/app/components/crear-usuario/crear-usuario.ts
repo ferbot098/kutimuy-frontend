@@ -4,6 +4,12 @@ import { FormsModule } from '@angular/forms';
 
 import { Usuario as UsuarioModel } from '../../models/usuario';
 import { UsuarioService } from '../../services/usuario';
+import {
+  MENSAJE_PASSWORD,
+  esPasswordSegura,
+  esSoloLetras,
+  limpiarNombre
+} from '../../utils/validaciones';
 
 @Component({
   selector: 'app-usuario',
@@ -50,13 +56,30 @@ export class Usuario implements OnInit {
   guardarUsuario(): void {
 
     this.mensaje = '';
+    this.mensajeExito = '';
+
+    this.usuario.nombre = this.usuario.nombre.trim();
+    this.usuario.email = this.usuario.email.trim();
 
     if (
-      !this.usuario.nombre.trim() ||
-      !this.usuario.email.trim() ||
+      !this.usuario.nombre ||
+      !this.usuario.email ||
       (!this.editando && !this.usuario.password.trim())
     ) {
       this.mensaje = 'Complete todos los campos obligatorios';
+      return;
+    }
+
+    if (!esSoloLetras(this.usuario.nombre)) {
+      this.mensaje = 'El nombre solo debe contener letras';
+      return;
+    }
+
+    if (
+      this.usuario.password.trim() &&
+      !esPasswordSegura(this.usuario.password)
+    ) {
+      this.mensaje = MENSAJE_PASSWORD;
       return;
     }
 
@@ -137,5 +160,17 @@ export class Usuario implements OnInit {
   cancelarEdicion(): void {
     this.editando = false;
     this.usuario = this.usuarioVacio();
+  }
+
+  limitarNombre(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+    const valorLimpio = limpiarNombre(input.value);
+
+    if (input.value !== valorLimpio) {
+      input.value = valorLimpio;
+    }
+
+    this.usuario.nombre = valorLimpio;
   }
 }

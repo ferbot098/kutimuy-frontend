@@ -1,0 +1,41 @@
+<aside class="panel-accesibilidad" aria-label="Panel de accesibilidad">
+  <p class="panel-titulo">Accesibilidad</p>
+
+  <div class="panel-fila">
+    <button
+      type="button"
+      class="btn-escala"
+      aria-label="Reducir tamaño de la interfaz"
+      [disabled]="accesibilidad.escala() <= 100"
+      (click)="accesibilidad.reducirEscala()">
+      A−
+    </button>
+
+    <span class="porcentaje" aria-live="polite">{{ accesibilidad.escala() }}%</span>
+
+    <button
+      type="button"
+      class="btn-escala"
+      aria-label="Aumentar tamaño de la interfaz"
+      [disabled]="accesibilidad.escala() >= 150"
+      (click)="accesibilidad.aumentarEscala()">
+      A+
+    </button>
+
+    <button
+      type="button"
+      class="btn-contraste"
+      [attr.aria-pressed]="accesibilidad.altoContraste()"
+      (click)="accesibilidad.alternarAltoContraste()">
+      {{ accesibilidad.altoContraste() ? 'Desactivar contraste' : 'Alto contraste' }}
+    </button>
+  </div>
+
+  <button
+    type="button"
+    class="btn-botones-grandes"
+    [attr.aria-pressed]="accesibilidad.botonesGrandes()"
+    (click)="accesibilidad.alternarBotonesGrandes()">
+    {{ accesibilidad.botonesGrandes() ? 'Desactivar botones grandes' : 'Botones grandes' }}
+  </button>
+</aside>

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { Cliente } from '../../models/cliente';
 import { ClienteService } from '../../services/cliente';
+import { esSoloLetras, limpiarNombre } from '../../utils/validaciones';
 
 @Component({
   selector: 'app-clientes',
@@ -51,12 +52,23 @@ export class Clientes implements OnInit {
 
     this.mensaje = '';
 
+    this.cliente.nombres = this.cliente.nombres.trim();
+    this.cliente.apellidos = this.cliente.apellidos.trim();
+
     if (
-      !this.cliente.nombres.trim() ||
-      !this.cliente.apellidos.trim() ||
+      !this.cliente.nombres ||
+      !this.cliente.apellidos ||
       !this.cliente.documento.trim()
     ) {
       this.mensaje = 'Complete los campos obligatorios';
+      return;
+    }
+
+    if (
+      !esSoloLetras(this.cliente.nombres) ||
+      !esSoloLetras(this.cliente.apellidos)
+    ) {
+      this.mensaje = 'Los nombres y apellidos solo deben contener letras';
       return;
     }
 
@@ -128,5 +140,20 @@ export class Clientes implements OnInit {
   cancelarEdicion(): void {
     this.editando = false;
     this.cliente = this.clienteVacio();
+  }
+
+  limitarSoloLetras(
+    event: Event,
+    campo: 'nombres' | 'apellidos'
+  ): void {
+
+    const input = event.target as HTMLInputElement;
+    const valorLimpio = limpiarNombre(input.value);
+
+    if (input.value !== valorLimpio) {
+      input.value = valorLimpio;
+    }
+
+    this.cliente[campo] = valorLimpio;
   }
 }

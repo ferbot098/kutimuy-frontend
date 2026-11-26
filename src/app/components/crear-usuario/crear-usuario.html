@@ -28,7 +28,10 @@
             type="text"
             name="nombre"
             [(ngModel)]="usuario.nombre"
+            (input)="limitarNombre($event)"
             placeholder="Ingrese el nombre"
+            autocomplete="name"
+            maxlength="150"
             required>
         </div>
 
@@ -53,7 +56,12 @@
             name="password"
             [(ngModel)]="usuario.password"
             [placeholder]="editando ? 'Dejar vacío para no cambiar' : 'Ingrese la contraseña'"
+            autocomplete="new-password"
             [required]="!editando">
+
+          <p class="ayuda">
+            Mínimo 8 caracteres, una mayúscula, una minúscula y un signo.
+          </p>
         </div>
 
         <div class="campo">

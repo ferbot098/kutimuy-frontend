@@ -20,6 +20,7 @@ export class Login {
 
   mensaje: string = '';
   cargando: boolean = false;
+  mostrarPassword: boolean = false;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -28,19 +29,30 @@ export class Login {
 
   iniciarSesion(): void {
 
+    if (this.cargando) {
+      return;
+    }
+
     this.mensaje = '';
 
-    if (
-      !this.credenciales.email.trim() ||
-      !this.credenciales.password.trim()
-    ) {
+    const email = this.credenciales.email.trim();
+    const password = this.credenciales.password;
+
+    if (!email || !password.trim()) {
       this.mensaje = 'Ingrese su email y contraseña';
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.mensaje = 'Ingrese un email válido';
+      return;
+    }
+
+    this.credenciales.email = email;
+
     this.cargando = true;
 
-    this.usuarioService.login(this.credenciales).subscribe({
+    this.usuarioService.login({ email, password }).subscribe({
       next: (respuesta: LoginResponse) => {
         localStorage.setItem('token', respuesta.token);
         localStorage.setItem('usuario', JSON.stringify({
@@ -63,5 +75,9 @@ export class Login {
         }
       }
     });
+  }
+
+  alternarPassword(): void {
+    this.mostrarPassword = !this.mostrarPassword;
   }
 }
